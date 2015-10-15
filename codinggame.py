@@ -86,7 +86,7 @@ def generateNeighbourPositions(loc):
 
 def transform(pos,dest_list):
     x, y = pos
-    return [(dx-x, dy-y) for dx, dy in dest_list]
+    return [((dx-x+X_MAX)%X_MAX, (dy-y+Y_MAX)%Y_MAX) for dx, dy in dest_list]
 
 def vector(p1, p2):
   vx = p1[0] - p2[0]
@@ -116,22 +116,21 @@ def directions(list):
   directions = []
   for tpl in list:
     if(tpl == (1,0)):
-      directions.append('LEFT')
+      directions.append('RIGHT')
     if(tpl == (0,1)):
       directions.append('DOWN')
     if(tpl == (-1,0)):
-      directions.append('RIGHT')
+      directions.append('LEFT')
     if(tpl == (0,-1)):
       directions.append('UP')
   return directions
-
 # ---------------------- NEXT MOVE
 def next_move():
     me = players[my_id]
 
     current_pos = (me.position.x, me.position.y)
     longest = longestPath(current_pos)
-    v = vector(current_pos, longest[1]) 
+    v = vector(current_pos, longest[1])
 
     return directions([v])[0]
 
@@ -221,5 +220,5 @@ while 1:
 
     # print >> sys.stderr, "history: ", history
     print_history()
-    
+
     print next_move()
