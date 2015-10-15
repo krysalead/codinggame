@@ -25,7 +25,7 @@ my_id = int(raw_input())
 # . 0 . . 3 . . .
 # . . B B + B B 1
 
-history = [["." for x in range(15)] for x in range(30)]
+history = [["." for col in range(30)] for row in range(15)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
 
 def updateHistory(player, x, y):
@@ -36,7 +36,7 @@ def updateHistory(player, x, y):
       if cell == player: # if cell is player head
         #print >> sys.stderr, cell, player
         history[xx][yy] = playerTrail[player] # update with player trail
-  
+
   # 2 add new head
   history[x][y] = player
 
@@ -45,9 +45,9 @@ def updateHistory(player, x, y):
 while 1:
     helper_bots = int(raw_input())
     for i in xrange(player_count):
-        x, y = [int(j) for j in raw_input().split()]
+        col, row = [int(j) for j in raw_input().split()]
         # save in history
-        updateHistory(i, x, y)
+        updateHistory(i, row, col)
 
     removal_count = int(raw_input())
     for i in xrange(removal_count):
