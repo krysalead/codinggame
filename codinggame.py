@@ -1,10 +1,9 @@
 import sys
 import math
-
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
 
-# VARS
+# ---------------------- VARS
 player_count = int(raw_input())
 my_id = int(raw_input())
 
@@ -56,7 +55,7 @@ for n in range(player_count):
 holes = {}
 
 def cellAtPosition(x, y):
-  return history[x % 30, y % 15]
+  return history[x % 30][y % 15]
 
 def updateHistory(player_id, x, y):
   # 1 replace all heads with trails
