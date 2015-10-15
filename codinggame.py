@@ -13,7 +13,12 @@ Y_MAX = 15
 
 # GLOBAL FUNC
 history = [["." for x in range(Y_MAX)] for x in range(X_MAX)]
-playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
+playerTrail = {
+    0 : {"HEAD" : "A", "TAIL" : "a"},
+    1 : {"HEAD" : "B", "TAIL" : "b"},
+    2 : {"HEAD" : "C", "TAIL" : "c"},
+    3 : {"HEAD" : "D", "TAIL" : "d"}
+}
 OK_CELL = [".", "X"]
 
 # ----------------------  GLOBAL PRINT FUNC
@@ -57,12 +62,12 @@ def updateHistory(player_id, x, y):
   for xx, row in enumerate(history):
     for yy, cell in enumerate(row):
       #print >> sys.stderr, "CELL", cell
-      if cell == player_id: # if cell is player_id head
+      if cell == playerTrail[player_id]["HEAD"]: # if cell is player_id head
         #print >> sys.stderr, cell, player_id
-        history[xx][yy] = playerTrail[player_id] # update with player trail
+        history[xx][yy] = playerTrail[player_id]["TAIL"] # update with player trail
 
   # 2 add new head
-  history[x][y] = player_id
+  history[x][y] = playerTrail[player_id]["HEAD"]
 
 # ---------------------- Player Methods
 def updatePlayerPositionAndMissiles(i, x, y, helper_bots):
@@ -124,12 +129,11 @@ def directions(list):
 def next_move():
     me = players[my_id]
 
-    if turn > 1 and me.missiles > 0 and random.randint(1, 10) > 8:
-        return "DEPLOY"
+    current_pos = (me.position.x, me.position.y)
+    longest = longestPath(current_pos)
+    v = vector(current_pos, longest[1]) 
 
-    if cellAtPosition(me.position.x, me.position.y - 1) not in OK_CELL:
-        return "RIGHT"
-    return 'UP'
+    return directions([v])[0]
 
 def possible_moves(x, y, visited):
   nbs = checkNeighbour(x, y)
@@ -170,6 +174,9 @@ def print_players():
         else:
             debug("Player Destroyed")
         debug("")
+
+def distra():
+    pass
 
 # ----------------------
 # ---------------------- GAME LOOP
@@ -214,11 +221,5 @@ while 1:
 
     # print >> sys.stderr, "history: ", history
     print_history()
-
-    current_pos = (players[my_id].position.x, players[my_id].position.y)
-    longest = longestPath(current_pos)
-    v = vector(current_pos, longest[1]) 
-    debug(v)
-    debug(directions([v]))
-
-    print directions([v])[0]
+    
+    print next_move()
