@@ -7,6 +7,14 @@ import math
 player_count = int(raw_input())
 my_id = int(raw_input())
 
+#olivier
+
+class player:
+	position
+	id
+	missile
+
+
 # game loop
 while 1:
     helper_bots = int(raw_input())
