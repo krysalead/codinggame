@@ -13,7 +13,12 @@ Y_MAX = 15
 
 # GLOBAL FUNC
 history = [["." for x in range(Y_MAX)] for x in range(X_MAX)]
-playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
+playerTrail = {
+    0 : {"HEAD" : "A", "TAIL" : "a"},
+    1 : {"HEAD" : "B", "TAIL" : "b"},
+    2 : {"HEAD" : "C", "TAIL" : "c"},
+    3 : {"HEAD" : "D", "TAIL" : "d"}
+}
 OK_CELL = [".", "X"]
 
 # ----------------------  GLOBAL PRINT FUNC
@@ -57,12 +62,12 @@ def updateHistory(player_id, x, y):
   for xx, row in enumerate(history):
     for yy, cell in enumerate(row):
       #print >> sys.stderr, "CELL", cell
-      if cell == player_id: # if cell is player_id head
+      if cell == playerTrail[player_id]["HEAD"]: # if cell is player_id head
         #print >> sys.stderr, cell, player_id
-        history[xx][yy] = playerTrail[player_id] # update with player trail
+        history[xx][yy] = playerTrail[player_id]["TAIL"] # update with player trail
 
   # 2 add new head
-  history[x][y] = player_id
+  history[x][y] = playerTrail[player_id]["HEAD"]
 
 # ---------------------- Player Methods
 def updatePlayerPositionAndMissiles(i, x, y, helper_bots):
@@ -157,6 +162,9 @@ def print_players():
         else:
             debug("Player Destroyed")
         debug("")
+
+def distra():
+    pass
 
 # ----------------------
 # ---------------------- GAME LOOP
