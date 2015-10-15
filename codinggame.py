@@ -83,6 +83,15 @@ def transform(pos,dest_list):
     x, y = pos
     return [(dx-x, dy-y) for dx, dy in dest_list]
 
+def vector(p1, p2):
+  vx = p1[0] - p2[0]
+  vx = vx if vx < 1 else 1
+  vx = vx if vx > -1 else -1
+  vy = p1[1] - p2[1]
+  vy = vy if vy < 1 else 1
+  vy = vy if vy > -1 else -1
+  return (vx, vy)
+
 #start calculation
 def checkNeighbour(x,y):
     #check direct ones
@@ -126,8 +135,8 @@ def possible_moves(x, y, visited):
   nbs = checkNeighbour(x, y)
   return [x for x in nbs if x not in visited]
 
-def longestPath(current_x, current_y):
-  queue = [[(current_x, current_y)]]
+def longestPath(position):
+  queue = [[(position)]]
   visited = []
   paths = []
 
@@ -206,6 +215,10 @@ while 1:
     # print >> sys.stderr, "history: ", history
     print_history()
 
-    debug(longestPath(players[my_id].position.x, players[my_id].position.x))
+    current_pos = (players[my_id].position.x, players[my_id].position.y)
+    longest = longestPath(current_pos)
+    v = vector(current_pos, longest[1]) 
+    debug(v)
+    debug(directions([v]))
 
-    print next_move()
+    print directions([v])[0]
