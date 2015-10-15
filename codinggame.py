@@ -25,7 +25,18 @@ my_id = int(raw_input())
 # . 0 . . 3 . . .
 # . . B B + B B 1
 
-history = [["." for col in range(30)] for row in range(15)]
+class player(object):
+	def __init__(self,position,id,missile):
+		self.position = position
+		self.id = id
+		self.missile = missile
+	def updatePosition(self,position):
+		self.position=position
+class position(object):
+	def __init__(self,x,y):
+		self.x=x
+		self.y=y
+ history = [["." for x in range(15)] for x in range(30)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
 
 def updateHistory(player, x, y):
