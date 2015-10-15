@@ -61,6 +61,45 @@ def updateHistory(player_id, x, y):
   # 2 add new head
   history[x][y] = player_id
 
+def generateNeighbourPositions(loc):
+    x, y = loc
+    offsets = ((0, 1), (1, 0), (0, -1), (-1, 0))
+    return [(x + dx, y + dy) for dx, dy in offsets]
+
+def transform(pos,dest_list):
+    x, y = pos
+    return [(dx-x, dy-y) for dx, dy in dest_list]
+
+#start calculation
+def checkNeighbour(x,y):
+	#check direct ones
+	positions =[]
+	for pX,pY in generateNeighbourPositions((x,y)):
+		#check the first level
+		if(cellAtPosition(pX,pY)=='.'):
+			#check the second level
+			for ppX,ppY in generateNeighbourPositions((pX,pY)):
+				if(cellAtPosition(pX,pY)=='.'):
+					#it is clean on 2 level we can go this direction
+					if (pX,pY) not in positions:
+						positions.append((pX % X_MAX, pY % Y_MAX))
+	debug(positions)
+	return positions
+
+def directions(list):
+	directions = []
+	for tpl in list:
+		if(tpl == (1,0)):
+			directions.append('TOP')
+		if(tpl == (0,1)):
+			directions.append('RIGHT')
+		if(tpl == (-1,0)):
+			directions.append('BOTTOM')
+		if(tpl == (0,-1)):
+			directions.append('LEFT')
+	return directions
+
+
 # ---------------------- NEXT MOVE
 def next_move():
     me = players[my_id]
