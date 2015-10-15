@@ -85,8 +85,7 @@ def generateNeighbourPositions(loc):
     return [(x + dx, y + dy) for dx, dy in offsets]
 
 def transform(pos,dest_list):
-    x, y = pos
-    return [((dx-x+X_MAX)%X_MAX, (dy-y+Y_MAX)%Y_MAX) for dx, dy in dest_list]
+    return [vector(pos, x) for x in dest_list]
 
 def vector(p1, p2):
   vx = p1[0] - p2[0]
