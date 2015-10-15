@@ -10,6 +10,7 @@ from copy import copy, deepcopy
 player_count = int(raw_input())
 my_id = int(raw_input())
 
+threshold = 5
 X_MAX = 30
 Y_MAX = 15
 
@@ -157,25 +158,27 @@ def future():
     mey = me.position.y
     last_move = memoves[-1]
 
-    threshold = 3
+
     stuff_ahead = []
     if last_move == "UP":
-        stuff_ahead = [(mex, (mey - i)%Y_MAX)  for i in range(threshold)]
+        stuff_ahead = [(mex, (mey - i)% Y_MAX)  for i in range(threshold)]
     if last_move == "DOWN":
-        stuff_ahead = [(mex, (mey + i)%Y_MAX)  for i in range(threshold)]
+        stuff_ahead = [(mex, (mey + i)% Y_MAX)  for i in range(threshold)]
     if last_move == "LEFT":
-        stuff_ahead = [((mex - i ) %X_MAX, mey )  for i in range(threshold)]
+        stuff_ahead = [((mex - i ) % X_MAX, mey )  for i in range(threshold)]
     if last_move == "RIGHT":
-        stuff_ahead = [((mex + i ) %X_MAX, mey )  for i in range(threshold)]
+        stuff_ahead = [((mex + i ) % X_MAX, mey )  for i in range(threshold)]
 
     debug(stuff_ahead)
 
+    count_missiles = me.missiles
     for cell in stuff_ahead:
-
         trail = ["a","b","c","d"]
         if cellAtPosition(cell[0], cell[1]) in trail:
-            future_map[cell[0]][cell[1]] = "."
-            break
+            if count_missiles > 0:
+                future_map[cell[0]][cell[1]] = "."
+                count_missiles = count_missiles - 1
+
     return future_map
 
 
@@ -202,9 +205,9 @@ def next_move():
     debug(len(paths[0]))
     debug(len(future_paths[0]))
 
-    chosenOne = future_paths if len(future_paths[0]) > len(paths[0]) + 5 else paths
+    chosenOne = future_paths if len(future_paths[0]) > len(paths[0]) + threshold else paths
 
-    forceShoot = True if len(future_paths[0]) > len(paths[0]) + 5 else False
+    forceShoot = True if len(future_paths[0]) > len(paths[0]) + threshold else False
     if forceShoot:
         return "DEPLOY"
 
