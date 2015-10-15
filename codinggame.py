@@ -58,7 +58,7 @@ for n in range(player_count):
 holes = {}
 
 def cellAtPosition(x, y):
-  return history[x % 30][y % 15]
+  return history[x % X_MAX][y % Y_MAX]
 
 def updateHistory(player_id, x, y):
   # 1 replace all heads with trails
