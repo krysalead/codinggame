@@ -9,11 +9,19 @@ my_id = int(raw_input())
 
 #olivier
 
-class player:
-	position
-	id
-	missile
+class player(object):
+	def __init__(self,position,id,missile):
+		self.position = position
+		self.id = id
+		self.missile = missile
+	def updatePosition(self,position):
+		self.position=position
 
+
+class position(object):
+	def __init__(self,x,y):
+		self.x=x
+		self.y=y
 
 # game loop
 while 1:
