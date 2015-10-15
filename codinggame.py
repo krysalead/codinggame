@@ -7,24 +7,12 @@ import math
 player_count = int(raw_input())
 my_id = int(raw_input())
 
-# History format:
-# X for empty Cell
-# id for player for the lastest position
-# [A, B, C, D] for trail of respective players
-# example:
-# . A . . C . . .
-# . 0 . . 3 . . .
-# . . B B + B B 1
+#olivier
 
-history = [["." for x in range(15)] for x in range(30)]
-players = {0 : "A", 1: "B", 2: "C", 3: "D"}
-
-def updateHistory(player, x, y):
-  # 1 replace all heads with trails
-  for XXX in history:
-    XXX = [players[player] for xxx in XXX if xxx == player]
-  # 2 add new head
-  history[x][y] = players[player]
+#class player:
+#	position
+#	id
+#	missile
 
 
 # game loop
