@@ -21,6 +21,8 @@ my_id = int(raw_input())
 def debug(message):
     print >> sys.stderr, message
 
+
+
 history = [["." for x in range(15)] for x in range(30)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
 
@@ -32,7 +34,6 @@ def print_history():
         debug("")
 
 
-#CLASSES
 class Player(object):
     def __init__(self,position,id,missile):
         self.position = position
@@ -54,6 +55,8 @@ for n in range(player_count):
     players[n] = Player(Position(0,0), n, 0)
 holes = {}
 
+def cellAtPosition(x, y):
+  return history[x % 30, y % 15]
 
 def updateHistory(player_id, x, y):
   # 1 replace all heads with trails
