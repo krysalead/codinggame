@@ -70,32 +70,30 @@ def transform(pos,dest_list):
 
 #start calculation
 def checkNeighbour(x,y):
-	#check direct ones
-	positions =[]
-	for pX,pY in generateNeighbourPositions((x,y)):
-		#check the first level
-		if(cellAtPosition(pX,pY)=='.'):
-			#check the second level
-			for ppX,ppY in generateNeighbourPositions((pX,pY)):
-				if(cellAtPosition(pX,pY)=='.'):
-					#it is clean on 2 level we can go this direction
-					if (pX,pY) not in positions:
-						positions.append((pX % X_MAX, pY % Y_MAX))
-	return positions
+  #check direct ones
+  positions =[]
+  for pX,pY in generateNeighbourPositions((x,y)):
+    #check the first level
+    if(cellAtPosition(pX,pY)=='.'):
+      #check the second level
+      for ppX,ppY in generateNeighbourPositions((pX,pY)):
+        if(cellAtPosition(pX,pY)=='.'):
+          #it is clean on 2 level we can go this direction
+          if (pX,pY) not in positions:
+            positions.append((pX % X_MAX, pY % Y_MAX))
+  return positions
 
 def directions(list):
-	directions = []
-	for tpl in list:
-		if(tpl == (1,0)):
-			directions.append('TOP')
-		if(tpl == (0,1)):
-			directions.append('RIGHT')
-		if(tpl == (-1,0)):
-			directions.append('BOTTOM')
-		if(tpl == (0,-1)):
-			directions.append('LEFT')
-	return directions
-
+  directions = []
+  for tpl in list:
+    if(tpl == (1,0)):
+      directions.append('LEFT')
+    if(tpl == (0,1)):
+      directions.append('DOWN')
+    if(tpl == (-1,0)):
+      directions.append('RIGHT')
+    if(tpl == (0,-1)):
+      directions.append('UP')
 
 # ---------------------- NEXT MOVE
 def next_move():
