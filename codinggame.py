@@ -1,6 +1,8 @@
 import sys
 import math
 import random
+from copy import copy, deepcopy
+
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
 
@@ -10,6 +12,8 @@ my_id = int(raw_input())
 
 X_MAX = 30
 Y_MAX = 15
+
+memoves = []
 
 # GLOBAL FUNC
 history = [["." for x in range(Y_MAX)] for x in range(X_MAX)]
@@ -56,8 +60,8 @@ players = {}
 for n in range(player_count):
     players[n] = Player(Position(0,0), n, 3)
 # ---------------------- HISTORY METHODS
-def cellAtPosition(x, y):
-  return history[x % X_MAX][y % Y_MAX]
+def cellAtPosition(x, y, matrix = history):
+  return matrix[x % X_MAX][y % Y_MAX]
 
 def updateHistory(player_id, x, y):
   # 1 replace all heads with trails
@@ -101,15 +105,13 @@ def generateNeighbourPositions(loc):
     return [((x + dx) % X_MAX, (y + dy) % Y_MAX) for dx, dy in offsets]
 
 #start calculation
-def checkNeighbour(x,y):
-
-
+def checkNeighbour(x,y, matrix=history):
 
     #check direct ones
     positions =[]
     for pX,pY in generateNeighbourPositions((x,y)):
         #check the first level
-        if(cellAtPosition(pX,pY) in OK_CELL):
+        if(cellAtPosition(pX,pY, matrix) in OK_CELL):
             positions.append((pX, pY))
             # #check the second level
             #for ppX,ppY in generateNeighbourPositions((pX,pY)):
@@ -133,6 +135,7 @@ def moveFromCoordinates((x,y)):
 
 
 def isNextMoveValid(current, next):
+    #return True
     valid_cells = generateNeighbourPositions(next)
     heads = ["A","B","C","D"]
     heads.remove(playerTrail[my_id]["HEAD"])
@@ -142,35 +145,96 @@ def isNextMoveValid(current, next):
             return False
     return True
 
+def future():
+    me = players[my_id]
+
+    if (len(memoves)) == 0 or me.missiles == 0:
+        return history
+
+    future_map = deepcopy(history)
+
+    mex = me.position.x
+    mey = me.position.y
+    last_move = memoves[-1]
+
+    threshold = 3
+    stuff_ahead = []
+    if last_move == "UP":
+        stuff_ahead = [(mex, (mey - i)%Y_MAX)  for i in range(threshold)]
+    if last_move == "DOWN":
+        stuff_ahead = [(mex, (mey + i)%Y_MAX)  for i in range(threshold)]
+    if last_move == "LEFT":
+        stuff_ahead = [((mex - i ) %X_MAX, mey )  for i in range(threshold)]
+    if last_move == "RIGHT":
+        stuff_ahead = [((mex + i ) %X_MAX, mey )  for i in range(threshold)]
+
+    debug(stuff_ahead)
+
+    for cell in stuff_ahead:
+
+        trail = ["a","b","c","d"]
+        if cellAtPosition(cell[0], cell[1]) in trail:
+            future_map[cell[0]][cell[1]] = "."
+            break
+    return future_map
+
 
 
 # ---------------------- NEXT MOVE
 def next_move():
+
     me = players[my_id]
 
     current_pos = (me.position.x, me.position.y)
-    paths = possiblePaths(current_pos)
-    sorted(paths, key=len, reverse=True)
-    for path in paths:
+
+
+    future_map = future()
+    future_paths = possiblePaths(current_pos, future_map)
+    future_paths = sorted(future_paths, key=len, reverse=True)
+
+    paths = possiblePaths(current_pos, history)
+    paths = sorted(paths, key=len, reverse=True)
+
+    #for path in paths:
+    #    sys.stderr.write(" " + str(len(path)))
+
+    debug("")
+    debug(len(paths[0]))
+    debug(len(future_paths[0]))
+
+    chosenOne = future_paths if len(future_paths[0]) > len(paths[0]) + 5 else paths
+
+    forceShoot = True if len(future_paths[0]) > len(paths[0]) + 5 else False
+    if forceShoot:
+        return "DEPLOY"
+
+    for path in chosenOne:
         if len(path) > 1:
             next_cell = path[1]
             if isNextMoveValid(current_pos, next_cell):
                 return moveFromCoordinates(next_cell)
 
+    for path in chosenOne:
+        if len(path) > 1:
+            x,y = path[0]
+            moves = checkNeighbour(x,y)
+            if len(moves) == 1:
+                return moveFromCoordinates(moves[0])
+
     return "DEPLOY"
 
-def possible_moves(x, y, visited):
-  nbs = checkNeighbour(x, y)
+def possible_moves(x, y, visited, matrix):
+  nbs = checkNeighbour(x, y, matrix)
   return [x for x in nbs if x not in visited]
 
-def possiblePaths(position):
+def possiblePaths(position, matrix):
   queue = [[(position)]]
   visited = []
   paths = []
 
   while queue != []:
     current = queue.pop(0) # current is an array of cords [(x, y), ...]
-    nbs = possible_moves(current[-1][0], current[-1][1], visited)
+    nbs = possible_moves(current[-1][0], current[-1][1], visited, matrix)
     if len(nbs) == 0:
       # end of options, append to the paths
       paths.append(current)
@@ -204,7 +268,11 @@ def print_players():
 # ---------------------- GAME LOOP
 # ----------------------
 turn = 0
+
 while 1:
+
+
+
     helper_bots = int(raw_input())
     turn = turn + 1
     debug("# ----- TURN " + str(turn) + "------------------ #")
@@ -225,8 +293,9 @@ while 1:
     holes_turn = []
     for i in xrange(removal_count):
         remove_x, remove_y = [int(j) for j in raw_input().split()]
-        history[remove_x][remove_y] = "X"
-        holes_turn.append((remove_x, remove_y))
+        if (players[my_id].position.x != remove_x and players[my_id].position.y != remove_y):
+            history[remove_x][remove_y] = "X"
+            holes_turn.append((remove_x, remove_y))
         holes_history.append((remove_x, remove_y))
     debug("-- Turn Removal Coordinates:")
     debug(holes_turn)
@@ -243,4 +312,7 @@ while 1:
 
     # print >> sys.stderr, "history: ", history
     print_history()
-    print next_move()
+    next = next_move()
+    memoves.append(next)
+    print next
+
