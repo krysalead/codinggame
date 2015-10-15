@@ -16,6 +16,9 @@ my_id = int(raw_input())
 # . 0 . . 3 . . .
 # . . B B + B B 1
 
+X_MAX = 30
+Y_MAX = 15
+
 # GLOBAL FUNC
 def debug(message):
     print >> sys.stderr, message
