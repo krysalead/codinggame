@@ -3,6 +3,7 @@ import math
 import random
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
+
 # ---------------------- GAME VARS
 player_count = int(raw_input())
 my_id = int(raw_input())
@@ -107,9 +108,32 @@ def next_move():
         return "RIGHT"
     return 'UP'
 
+def longestPath(current_x, current_y):
+  queue = [[(current_x, current_y)]]
+  visited = []
+  paths = []
+
+  while queue != []:
+    current = queue.pop(0) # current is an array of cords [(x, y), ...]
+    if possible_moves(current[-1][0], current[-1][1]) == []:
+      # end of options, append to the paths
+      paths.append(current)
+    else:
+      # move is the new (x, y)
+      for move in possible_moves(current[-1][0], current[-1][1]):
+        if move not in visited:
+          # append new path to the queue
+          queue.append(current + [move])
+          visited.append(move)
+  # at this point we have all possible paths
+  # return the longest
+  return max(paths, key=len)
+
 # --------------------- Missiles
 def adjust_missiles_count():
     pass
+
+
 # ----------------------
 # ---------------------- GAME LOOP
 # ----------------------
