@@ -3,6 +3,15 @@ import math
 
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
+def debug(message):
+    print >> sys.stderr, message
+
+def print_history():
+    for row in history:
+        for col in row:
+            sys.stderr.write(str(col))
+            sys.stderr.write(" ")
+        debug("")
 
 player_count = int(raw_input())
 my_id = int(raw_input())
@@ -20,7 +29,6 @@ history = [["." for x in range(15)] for x in range(30)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
 
 def updateHistory(player, x, y):
-  print >> sys.stderr, player 
   # 1 replace all heads with trails
   for xx, row in enumerate(history):
     for yy, cell in enumerate(row):
@@ -47,6 +55,7 @@ while 1:
 
     # Write an action using print
     # To debug: print >> sys.stderr, "Debug messages..."
-    print >> sys.stderr, "history:", history
-    
-    print "UP"
+
+    # print >> sys.stderr, "history: ", history
+    print_history()
+    print "up"
