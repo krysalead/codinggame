@@ -14,6 +14,8 @@ Y_MAX = 15
 # GLOBAL FUNC
 history = [["." for x in range(Y_MAX)] for x in range(X_MAX)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
+OK_CELL = [".", "X"]
+
 # ----------------------  GLOBAL PRINT FUNC
 def debug(message):
     print >> sys.stderr, message
@@ -26,10 +28,10 @@ def print_history():
         debug("")
 # ---------------------- PLAYER CLASS
 class Player(object):
-    def __init__(self,position,id,missile):
+    def __init__(self,position,id,missiles):
         self.position = position
         self.id = id
-        self.missile = missile
+        self.missiles = missiles
 
     def updatePosition(self,position):
         self.position=position
@@ -39,8 +41,11 @@ class Position(object):
         self.x=x
         self.y=y
 # ---------------------- PLAYER DICTIONARY
+
+holes_turn = []
+holes_history = []
+
 players = {}
-holes = []
 for n in range(player_count):
     players[n] = Player(Position(0,0), n, 3)
 # ---------------------- HISTORY METHODS
@@ -59,6 +64,16 @@ def updateHistory(player_id, x, y):
   # 2 add new head
   history[x][y] = player_id
 
+# ---------------------- Player Methods
+def updatePlayerPositionAndMissiles(i, x, y, helper_bots):
+    players[i].position.x = x
+    players[i].position.y = y
+    if i == my_id:
+        players[i].missiles = helper_bots
+
+
+
+# ---------------------- Neighbour
 def generateNeighbourPositions(loc):
     x, y = loc
     offsets = ((0, 1), (1, 0), (0, -1), (-1, 0))
@@ -70,18 +85,18 @@ def transform(pos,dest_list):
 
 #start calculation
 def checkNeighbour(x,y):
-  #check direct ones
-  positions =[]
-  for pX,pY in generateNeighbourPositions((x,y)):
-    #check the first level
-    if(cellAtPosition(pX,pY)=='.'):
-      #check the second level
-      for ppX,ppY in generateNeighbourPositions((pX,pY)):
-        if(cellAtPosition(pX,pY)=='.'):
-          #it is clean on 2 level we can go this direction
-          if (pX,pY) not in positions:
-            positions.append((pX % X_MAX, pY % Y_MAX))
-  return positions
+    #check direct ones
+    positions =[]
+    for pX,pY in generateNeighbourPositions((x,y)):
+        #check the first level
+        if(cellAtPosition(pX,pY) in OK_CELL):
+            #check the second level
+            for ppX,ppY in generateNeighbourPositions((pX,pY)):
+                if(cellAtPosition(pX,pY) in OK_CELL):
+                    #it is clean on 2 level we can go this direction
+                    if (pX,pY) not in positions:
+                        positions.append((pX % X_MAX, pY % Y_MAX))
+    return positions
 
 def directions(list):
   directions = []
@@ -94,15 +109,16 @@ def directions(list):
       directions.append('RIGHT')
     if(tpl == (0,-1)):
       directions.append('UP')
+  return directions
 
 # ---------------------- NEXT MOVE
 def next_move():
     me = players[my_id]
 
-    if random.randint(1, 10) > 8:
+    if turn > 1 and me.missiles > 0 and random.randint(1, 10) > 8:
         return "DEPLOY"
 
-    if cellAtPosition(me.position.x, me.position.y - 1) != ".":
+    if cellAtPosition(me.position.x, me.position.y - 1) not in OK_CELL:
         return "RIGHT"
     return 'UP'
 
@@ -131,37 +147,55 @@ def longestPath(current_x, current_y):
 def adjust_missiles_count():
     pass
 
+def print_players():
+    for id in players:
+        debug("")
+        debug("Player ID: " + str(players[id].id))
+        if players[id].position.x != -1:
+            debug("Player Missiles: " + str(players[id].missiles))
+            debug("Player Coordinates: " + str(players[id].position.x) + " - " + str(players[id].position.y))
+        else:
+            debug("Player Destroyed")
+        debug("")
 
 # ----------------------
 # ---------------------- GAME LOOP
 # ----------------------
+turn = 0
 while 1:
     helper_bots = int(raw_input())
+    turn = turn + 1
+    debug("# ----- TURN " + str(turn) + "------------------ #")
+    debug("Player ID:" + str(my_id))
+    debug("Helper Bots:" + str(helper_bots))
+
+    debug("")
+
     for i in xrange(player_count):
         x, y = [int(j) for j in raw_input().split()]
         # save in history
         updateHistory(i, x, y)
-
-        players[i].position.x = x
-        players[i].position.y = y
-        if i == my_id:
-            players[i].missile = helper_bots
-
+        updatePlayerPositionAndMissiles(i, x, y, helper_bots)
 
     removal_count = int(raw_input())
-    debug("-- Removal Count:" + removal_count)
-    for i in xrange(removal_count):
+    debug("-- Removal Count:" + str(removal_count))
 
+    holes_turn = []
+    for i in xrange(removal_count):
         remove_x, remove_y = [int(j) for j in raw_input().split()]
         history[remove_x][remove_y] = "X"
-        holes = []
-        holes.append((remove_x, remove_y))
+        holes_turn.append((remove_x, remove_y))
+        holes_history.append((remove_x, remove_y))
+    debug("-- Turn Removal Coordinates:")
+    debug(holes_turn)
+    debug("-- History of Removal Coordinates:")
+    debug(holes_history)
 
-        debug("-- Removal Coordinates:")
-        debug(holes)
+    # Printing Players status
+    print_players()
 
 
-
+    debug("# ----------------------- #")
     # Write an action using print
     # To debug: print >> sys.stderr, "Debug messages..."
 
