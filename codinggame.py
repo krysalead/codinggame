@@ -3,16 +3,8 @@ import math
 
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
-def debug(message):
-    print >> sys.stderr, message
 
-def print_history():
-    for row in history:
-        for col in row:
-            sys.stderr.write(str(col))
-            sys.stderr.write(" ")
-        debug("")
-
+# VARS
 player_count = int(raw_input())
 my_id = int(raw_input())
 
@@ -25,40 +17,69 @@ my_id = int(raw_input())
 # . 0 . . 3 . . .
 # . . B B + B B 1
 
-class player(object):
-	def __init__(self,position,id,missile):
-		self.position = position
-		self.id = id
-		self.missile = missile
-	def updatePosition(self,position):
-		self.position=position
-class position(object):
-	def __init__(self,x,y):
-		self.x=x
-		self.y=y
- history = [["." for x in range(15)] for x in range(30)]
+# GLOBAL FUNC
+def debug(message):
+    print >> sys.stderr, message
+
+history = [["." for x in range(15)] for x in range(30)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
 
-def updateHistory(player, x, y):
+def print_history():
+    for i in range(15):
+        for col in history:
+            sys.stderr.write(str(col[i]))
+            sys.stderr.write(" ")
+        debug("")
+
+
+#CLASSES
+class Player(object):
+    def __init__(self,position,id,missile):
+        self.position = position
+        self.id = id
+        self.missile = missile
+
+    def updatePosition(self,position):
+        self.position=position
+
+class Position(object):
+    def __init__(self,x,y):
+        self.x=x
+        self.y=y
+
+
+
+players = {}
+for n in range(player_count):
+    players[n] = Player(Position(0,0), n, 0)
+
+
+
+def updateHistory(player_id, x, y):
   # 1 replace all heads with trails
   for xx, row in enumerate(history):
     for yy, cell in enumerate(row):
       #print >> sys.stderr, "CELL", cell
-      if cell == player: # if cell is player head
-        #print >> sys.stderr, cell, player
-        history[xx][yy] = playerTrail[player] # update with player trail
+      if cell == player_id: # if cell is player_id head
+        #print >> sys.stderr, cell, player_id
+        history[xx][yy] = playerTrail[player_id] # update with player trail
 
   # 2 add new head
-  history[x][y] = player
+  history[x][y] = player_id
 
 
 # game loop
 while 1:
     helper_bots = int(raw_input())
     for i in xrange(player_count):
-        col, row = [int(j) for j in raw_input().split()]
+        x, y = [int(j) for j in raw_input().split()]
         # save in history
-        updateHistory(i, row, col)
+        updateHistory(i, x, y)
+        players[i].position.x = x
+        players[i].position.y = y
+
+    for player in players:
+        debug(player)
 
     removal_count = int(raw_input())
     for i in xrange(removal_count):
