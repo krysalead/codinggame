@@ -70,8 +70,7 @@ def updateHistory(player_id, x, y):
 
 def next_move():
     me = players[my_id]
-
-    if history[me.position.x][me.position.y + 1] != ".":
+    if history[me.position.x][me.position.y - 1] != ".":
         print "RIGHT"
     print 'UP'
 
