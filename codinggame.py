@@ -83,7 +83,6 @@ def checkNeighbour(x,y):
 					#it is clean on 2 level we can go this direction
 					if (pX,pY) not in positions:
 						positions.append((pX % X_MAX, pY % Y_MAX))
-	debug(positions)
 	return positions
 
 def directions(list):
