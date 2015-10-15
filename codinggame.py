@@ -1,8 +1,8 @@
 import sys
 import math
+import random
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
-
 # ---------------------- GAME VARS
 player_count = int(raw_input())
 my_id = int(raw_input())
@@ -11,19 +11,18 @@ X_MAX = 30
 Y_MAX = 15
 
 # GLOBAL FUNC
-history = [["." for x in range(15)] for x in range(30)]
+history = [["." for x in range(Y_MAX)] for x in range(X_MAX)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
 # ----------------------  GLOBAL PRINT FUNC
 def debug(message):
     print >> sys.stderr, message
 
 def print_history():
-    for i in range(15):
+    for i in range(Y_MAX):
         for col in history:
             sys.stderr.write(str(col[i]))
             sys.stderr.write(" ")
         debug("")
-
 # ---------------------- PLAYER CLASS
 class Player(object):
     def __init__(self,position,id,missile):
@@ -38,13 +37,11 @@ class Position(object):
     def __init__(self,x,y):
         self.x=x
         self.y=y
-
 # ---------------------- PLAYER DICTIONARY
 players = {}
+holes = []
 for n in range(player_count):
-    players[n] = Player(Position(0,0), n, 0)
-holes = {}
-
+    players[n] = Player(Position(0,0), n, 3)
 # ---------------------- HISTORY METHODS
 def cellAtPosition(x, y):
   return history[x % X_MAX][y % Y_MAX]
@@ -102,10 +99,17 @@ def directions(list):
 # ---------------------- NEXT MOVE
 def next_move():
     me = players[my_id]
+
+    if random.randint(1, 10) > 8:
+        return "DEPLOY"
+
     if cellAtPosition(me.position.x, me.position.y - 1) != ".":
         return "RIGHT"
     return 'UP'
 
+# --------------------- Missiles
+def adjust_missiles_count():
+    pass
 # ----------------------
 # ---------------------- GAME LOOP
 # ----------------------
@@ -115,12 +119,26 @@ while 1:
         x, y = [int(j) for j in raw_input().split()]
         # save in history
         updateHistory(i, x, y)
+
         players[i].position.x = x
         players[i].position.y = y
+        if i == my_id:
+            players[i].missile = helper_bots
+
 
     removal_count = int(raw_input())
+    debug("-- Removal Count:" + removal_count)
     for i in xrange(removal_count):
+
         remove_x, remove_y = [int(j) for j in raw_input().split()]
+        history[remove_x][remove_y] = "X"
+        holes = []
+        holes.append((remove_x, remove_y))
+
+        debug("-- Removal Coordinates:")
+        debug(holes)
+
+
 
     # Write an action using print
     # To debug: print >> sys.stderr, "Debug messages..."
