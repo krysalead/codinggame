@@ -108,6 +108,10 @@ def next_move():
         return "RIGHT"
     return 'UP'
 
+def possible_moves(x, y, visited):
+  nbs = checkNeighbour(x, y)
+  return [x for x in nbs if x not in visited]
+
 def longestPath(current_x, current_y):
   queue = [[(current_x, current_y)]]
   visited = []
@@ -115,18 +119,19 @@ def longestPath(current_x, current_y):
 
   while queue != []:
     current = queue.pop(0) # current is an array of cords [(x, y), ...]
-    if possible_moves(current[-1][0], current[-1][1]) == []:
+    nbs = possible_moves(current[-1][0], current[-1][1], visited)
+    if len(nbs) == 0:
       # end of options, append to the paths
       paths.append(current)
     else:
       # move is the new (x, y)
-      for move in possible_moves(current[-1][0], current[-1][1]):
-        if move not in visited:
+      for move in nbs:
           # append new path to the queue
           queue.append(current + [move])
           visited.append(move)
   # at this point we have all possible paths
   # return the longest
+  debug(paths)
   return max(paths, key=len)
 
 # --------------------- Missiles
@@ -151,7 +156,7 @@ while 1:
 
 
     removal_count = int(raw_input())
-    debug("-- Removal Count:" + removal_count)
+    #debug("-- Removal Count:" + removal_count)
     for i in xrange(removal_count):
 
         remove_x, remove_y = [int(j) for j in raw_input().split()]
@@ -169,4 +174,7 @@ while 1:
 
     # print >> sys.stderr, "history: ", history
     print_history()
+
+    debug(longestPath(players[my_id].position.x, players[my_id].position.x))
+
     print next_move()
