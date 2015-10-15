@@ -20,6 +20,8 @@ playerTrail = {
     3 : {"HEAD" : "D", "TAIL" : "d"}
 }
 OK_CELL = [".", "X"]
+NOT_HEAD_CELL = [".", "X", "a", "b", "c", "d"]
+
 
 # ----------------------  GLOBAL PRINT FUNC
 def debug(message):
@@ -76,68 +78,92 @@ def updatePlayerPositionAndMissiles(i, x, y, helper_bots):
     if i == my_id:
         players[i].missiles = helper_bots
 
-
-
 # ---------------------- Neighbour
+
+# def transform(pos,dest_list):
+#     return [vector(pos, x) for x in dest_list]
+
+def vector(p1, p2):
+    vx = p2[0] - p1[0]
+    vy = p2[1] - p1[1]
+
+    vx = vx if vx < 2 else -1
+    vx = vx if vx > -2 else 1
+
+    vy = vy if vy < 2 else -1
+    vy = vy if vy > -2 else 1
+
+    return (vx, vy)
+
 def generateNeighbourPositions(loc):
     x, y = loc
     offsets = ((0, 1), (1, 0), (0, -1), (-1, 0))
-    return [(x + dx, y + dy) for dx, dy in offsets]
-
-def transform(pos,dest_list):
-    return [vector(pos, x) for x in dest_list]
-
-def vector(p1, p2):
-  vx = p1[0] - p2[0]
-  vx = vx if vx < 1 else 1
-  vx = vx if vx > -1 else -1
-  vy = p1[1] - p2[1]
-  vy = vy if vy < 1 else 1
-  vy = vy if vy > -1 else -1
-  return (vx, vy)
+    return [((x + dx) % X_MAX, (y + dy) % Y_MAX) for dx, dy in offsets]
 
 #start calculation
 def checkNeighbour(x,y):
+
+
+
     #check direct ones
     positions =[]
     for pX,pY in generateNeighbourPositions((x,y)):
         #check the first level
         if(cellAtPosition(pX,pY) in OK_CELL):
-            #check the second level
-            for ppX,ppY in generateNeighbourPositions((pX,pY)):
-                if(cellAtPosition(pX,pY) in OK_CELL):
-                    #it is clean on 2 level we can go this direction
-                    if (pX,pY) not in positions:
-                        positions.append((pX % X_MAX, pY % Y_MAX))
+            positions.append((pX, pY))
+            # #check the second level
+            #for ppX,ppY in generateNeighbourPositions((pX,pY)):
+            #    if(cellAtPosition(pX,pY) in OK_CELL):
+            #         #it is clean on 2 level we can go this direction
+            #        if (pX,pY) not in positions:
+            #            positions.append((pX, pY))
     return positions
 
-def directions(list):
-  directions = []
-  for tpl in list:
-    if(tpl == (1,0)):
-      directions.append('RIGHT')
-    if(tpl == (0,1)):
-      directions.append('DOWN')
-    if(tpl == (-1,0)):
-      directions.append('LEFT')
-    if(tpl == (0,-1)):
-      directions.append('UP')
-  return directions
+def moveFromCoordinates((x,y)):
+    me = players[my_id]
+    v = vector((me.position.x, me.position.y), (x,y))
+    if(v == (1,0)):
+      return 'RIGHT'
+    if(v == (0,1)):
+      return 'DOWN'
+    if(v == (-1,0)):
+      return 'LEFT'
+    if(v == (0,-1)):
+      return 'UP'
+
+
+def isNextMoveValid(current, next):
+    valid_cells = generateNeighbourPositions(next)
+    heads = ["A","B","C","D"]
+    heads.remove(playerTrail[my_id]["HEAD"])
+    debug(heads)
+    for x,y in valid_cells:
+        if cellAtPosition(x,y) in heads:
+            return False
+    return True
+
+
+
 # ---------------------- NEXT MOVE
 def next_move():
     me = players[my_id]
 
     current_pos = (me.position.x, me.position.y)
-    longest = longestPath(current_pos)
-    v = vector(current_pos, longest[1])
+    paths = possiblePaths(current_pos)
+    sorted(paths, key=len, reverse=True)
+    for path in paths:
+        if len(path) > 1:
+            next_cell = path[1]
+            if isNextMoveValid(current_pos, next_cell):
+                return moveFromCoordinates(next_cell)
 
-    return directions([v])[0]
+    return "DEPLOY"
 
 def possible_moves(x, y, visited):
   nbs = checkNeighbour(x, y)
   return [x for x in nbs if x not in visited]
 
-def longestPath(position):
+def possiblePaths(position):
   queue = [[(position)]]
   visited = []
   paths = []
@@ -155,8 +181,8 @@ def longestPath(position):
           queue.append(current + [move])
           visited.append(move)
   # at this point we have all possible paths
-  # return the longest
-  return max(paths, key=len)
+
+  return paths
 
 # --------------------- Missiles
 def adjust_missiles_count():
@@ -173,8 +199,6 @@ def print_players():
             debug("Player Destroyed")
         debug("")
 
-def distra():
-    pass
 
 # ----------------------
 # ---------------------- GAME LOOP
@@ -219,5 +243,4 @@ while 1:
 
     # print >> sys.stderr, "history: ", history
     print_history()
-
     print next_move()
