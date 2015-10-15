@@ -3,30 +3,19 @@ import math
 # Auto-generated code below aims at helping you parse
 # the standard input according to the problem statement.
 
-# ---------------------- VARS
+# ---------------------- GAME VARS
 player_count = int(raw_input())
 my_id = int(raw_input())
-
-# History format:
-# X for empty Cell
-# id for player for the lastest position
-# [A, B, C, D] for trail of respective players
-# example:
-# . A . . C . . .
-# . 0 . . 3 . . .
-# . . B B + B B 1
 
 X_MAX = 30
 Y_MAX = 15
 
 # GLOBAL FUNC
-def debug(message):
-    print >> sys.stderr, message
-
-
-
 history = [["." for x in range(15)] for x in range(30)]
 playerTrail = {0 : "A", 1: "B", 2: "C", 3: "D"}
+# ----------------------  GLOBAL PRINT FUNC
+def debug(message):
+    print >> sys.stderr, message
 
 def print_history():
     for i in range(15):
@@ -35,7 +24,7 @@ def print_history():
             sys.stderr.write(" ")
         debug("")
 
-
+# ---------------------- PLAYER CLASS
 class Player(object):
     def __init__(self,position,id,missile):
         self.position = position
@@ -50,13 +39,13 @@ class Position(object):
         self.x=x
         self.y=y
 
-
-
+# ---------------------- PLAYER DICTIONARY
 players = {}
 for n in range(player_count):
     players[n] = Player(Position(0,0), n, 0)
 holes = {}
 
+# ---------------------- HISTORY METHODS
 def cellAtPosition(x, y):
   return history[x % X_MAX][y % Y_MAX]
 
@@ -72,15 +61,16 @@ def updateHistory(player_id, x, y):
   # 2 add new head
   history[x][y] = player_id
 
-
+# ---------------------- NEXT MOVE
 def next_move():
     me = players[my_id]
     if cellAtPosition(me.position.x, me.position.y - 1) != ".":
-        print "RIGHT"
-    print 'UP'
+        return "RIGHT"
+    return 'UP'
 
-
-# game loop
+# ----------------------
+# ---------------------- GAME LOOP
+# ----------------------
 while 1:
     helper_bots = int(raw_input())
     for i in xrange(player_count):
@@ -99,4 +89,4 @@ while 1:
 
     # print >> sys.stderr, "history: ", history
     print_history()
-    next_move()
+    print next_move()
