@@ -84,10 +84,10 @@ def possiblePaths(position, matrix):
       paths.append(current)
     else:
       # move is the new (x, y)
+      visited.append(current[-1])
       for move in nbs:
           # append new path to the queue
           queue.append(current + [move])
-          visited.append(move)
   # at this point we have all possible paths
 
   return paths

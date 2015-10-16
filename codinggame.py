@@ -192,8 +192,9 @@ def next_move():
 
 
     future_map = future()
-    future_paths = possiblePaths(current_pos, future_map)
-    future_paths = sorted(future_paths, key=len, reverse=True)
+    future_paths = [[]]
+    #future_paths = possiblePaths(current_pos, future_map)
+    #future_paths = sorted(future_paths, key=len, reverse=True)
 
     paths = possiblePaths(current_pos, history)
     paths = sorted(paths, key=len, reverse=True)
@@ -243,10 +244,10 @@ def possiblePaths(position, matrix):
       paths.append(current)
     else:
       # move is the new (x, y)
+      visited.append(current[-1])
       for move in nbs:
           # append new path to the queue
           queue.append(current + [move])
-          visited.append(move)
   # at this point we have all possible paths
 
   return paths
